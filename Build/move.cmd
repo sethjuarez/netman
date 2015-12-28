@@ -1,0 +1,1 @@
+cp ..\Release\netman.exe c:\util
