@@ -1,0 +1,71 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "ConsoleApp1 Console Application",
+  "authors": [ "sejuare" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    
+  },
+
+  "commands": {
+    "netman": "netman"
+  },
+
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Runtime": { },
+        "System.Runtime.Extensions": { },
+        "System.IO.Compression": { },
+        "System.IO.Compression.FileSystem": { }
+      }
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": { },
+        "System.Runtime.Extensions": { },
+        "System.IO.Compression": { },
+        "System.IO.Compression.FileSystem": { }
+      }
+    },
+    "dotnet": {
+      "compilationOptions": {
+        "define": [ "DOTNET" ]
+      },
+      "dependencies": {
+        "Microsoft.NETCore": "5.0.0",
+        "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+        "System.IO.FileSystem": "4.0.0",
+        "System.Reflection": "4.0.10",
+        "System.Reflection.TypeExtensions": "4.0.0",
+        "System.Runtime.Serialization.Primitives": "4.0.10",
+        "System.IO.Compression": "4.0.1-*",
+        "System.Runtime.Extensions": "4.0.10-*"
+      }
+    },
+    "dnxcore50": {
+      "compilationOptions": {
+        "define": [ "DNX" ] 
+      },
+      "dependencies": {
+        "System.Runtime": "4.0.21-*",
+        "Microsoft.CSharp": "4.0.1-*",
+        "System.Collections": "4.0.11-*",
+        "System.Console": "4.0.0-*",
+        "System.Linq": "4.0.1-*",
+        "System.Threading": "4.0.11-*",
+        "System.IO.FileSystem": "4.0.1-*",
+        "System.IO.Compression": "4.1.0-*",
+        "System.IO.Compression.ZipFile": "4.0.1-*",
+        "System.AppContext": "4.0.1-*"
+      }
+    }
+  }
+}

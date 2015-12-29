@@ -16,7 +16,8 @@ namespace netman
             var success = parser.Parse(args);
             if(!success)
             {
-                Console.WriteLine(parser.Help);
+                Write.EmphasisLine(parser.Message);
+                Write.NormalLine(parser.Help);
                 return;
             }
 

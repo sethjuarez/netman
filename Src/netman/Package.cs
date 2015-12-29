@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.IO.Compression;
-using System.Collections.Generic;
 
 namespace netman
 {
@@ -23,8 +21,8 @@ namespace netman
             }
             catch (IOException error)
             {
-                WriteLine(error.Message, ConsoleColor.Red);
-                Console.WriteLine("Try running with -c to clean the directory\nWARNING: It will delete all files in the directory");
+                Write.EmphasisLine(error.Message);
+                Write.NormalLine("Try running with -c to clean the directory\nWARNING: It will delete all files in the directory");
             }
         }
 
@@ -47,14 +45,14 @@ namespace netman
 
                 foreach (FileInfo file in directory.GetFiles())
                 {
-                    WriteLine($"Removing: {file.FullName}", ConsoleColor.Red);
+                    Write.EmphasisLine($"Removing: {file.FullName}");
                     try
                     {
                         file.Delete();
                     }
                     catch(IOException e)
                     {
-                        WriteLine(e.Message, ConsoleColor.Red);
+                        Write.EmphasisLine(e.Message);
                     }
                 }
             }
@@ -63,7 +61,7 @@ namespace netman
         private static void PrintDirectory(string dir)
         {
             foreach (string f in Directory.GetFiles(dir))
-                WriteLine($"Created: {f}", ConsoleColor.Green);
+                Write.OutcomeLine($"Created: {f}");
 
             foreach (string d in Directory.GetDirectories(dir))
                 PrintDirectory(d);
@@ -71,29 +69,24 @@ namespace netman
 
         public static string GetPackagePath()
         {
+#if DOTNET || DNX
+            return System.IO.Path.Combine(AppContext.BaseDirectory, "packages");
+#else
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);
             var path = Uri.UnescapeDataString(uri.Path);
             return System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), "packages");
+#endif
         }
 
         public static void List()
         {
             var packagePath = Package.GetPackagePath();
-            Console.Write("\n");
             if (Directory.Exists(packagePath))
             {
                 foreach (var zip in Directory.EnumerateFiles(packagePath, "*.zip"))
-                    WriteLine(System.IO.Path.GetFileNameWithoutExtension(zip), ConsoleColor.Green);
+                    Write.OutcomeLine(System.IO.Path.GetFileNameWithoutExtension(zip));
             }
-        }
-
-        private static void WriteLine(string text, ConsoleColor color)
-        {
-            var curColor = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            Console.WriteLine(text);
-            Console.ForegroundColor = curColor;
         }
     }
 }
