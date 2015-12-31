@@ -1,7 +1,7 @@
 ﻿{
   "version": "1.0.0-*",
-  "description": "ConsoleApp1 Console Application",
-  "authors": [ "sejuare" ],
+  "description": "netmam application",
+  "authors": [ "Seth Juarez" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
@@ -11,7 +11,7 @@
   },
 
   "dependencies": {
-    
+    "Newtonsoft.Json": "8.0.1"
   },
 
   "commands": {

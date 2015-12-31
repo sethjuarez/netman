@@ -7,6 +7,10 @@ namespace netman
 {
     public class Parser
     {
+        public bool Sync { get; set; }
+
+        public string SyncLocation { get; set; }
+
         public Package Package { get; set; }
 
         public bool Clean { get; set; }
@@ -21,15 +25,22 @@ namespace netman
         {
             Clean = false;
             List = false;
+            Sync = false;
+            SyncLocation = string.Empty;
             Message = String.Empty;
             Help = @"  
-    -c : Cleans working directory of all files
-    -l : Lists all available packages
+    -c:--clean             Cleans working directory of all files
+    -l:--list              Lists all available packages
+    -s:--sync [remote]   Synchronizes local packages (optionally synchronizes from remote)
 
     Samples:
         netman -l             (lists all packages)
         netman mypackage      (extracts mypackage to current working directory)
-        netman mypackage -c   (cleans working folder and extracts mypackage)";
+        netman mypackage -c   (cleans working folder and extracts mypackage)
+        netman -s             (synchronizes local packages as defined in the manifest)
+        netman -s remote      (synchronizes local packages by combining local and remote manifest)
+";
+
         }
 
         public bool Parse(string[] args)
@@ -37,19 +48,34 @@ namespace netman
             if (args.Length == 0)
                 return false;
 
-            List = Clean = false;
+            
+            Func<string, string, bool> cmp = (s1, s2)
+                => s1.ToLowerInvariant() == s2.ToLowerInvariant();
 
-            foreach (var a in args)
+
+            for (int i = 0; i < args.Length; i++)
             {
-                if (a.ToLowerInvariant() == "-l".ToLowerInvariant())
+                var a = args[i];
+                if (cmp(a, "-l") || cmp(a, "--list"))
                     List = true;
-                if (a.ToLowerInvariant() == "-c".ToLowerInvariant())
+                if (cmp(a, "-c") || cmp(a, "--clean"))
                     Clean = true;
+                if (cmp(a, "-s") || cmp(a, "--sync"))
+                {
+                    Sync = true;
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
+                    {
+                        SyncLocation = args[i + 1];
+                        i++;
+                    }
+                }
+
             }
 
-            var package = args[0];
-            if (!List)
+
+            if (!List && !Sync)
             {
+                var package = args[0];
                 var packagePath = Path.Combine(netman.Package.GetPackagePath(), $"{package}.zip");
                 if (!File.Exists(packagePath))
                 {
@@ -60,12 +86,10 @@ namespace netman
                 {
                     Package = new Package
                     {
-                        Name = package,
-                        Path = packagePath
+                        Name = package
                     };
                 }
             }
-
 
             return true;
         }

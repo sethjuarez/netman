@@ -1,6 +1,6 @@
 properties {
-	$majorVersion = "1.0"
-	$majorWithReleaseVersion = "1.0.0"
+	$majorVersion = "0.1"
+	$majorWithReleaseVersion = "0.1.0"
 	$version = GetVersion $majorWithReleaseVersion
 	$name = "netman"
 	$treatWarningsAsErrors = $true
@@ -12,6 +12,7 @@ properties {
 	$releaseDir = "$baseDir\Release"
 	$workingDir = "$baseDir\$workingName"
 	$workingSourceDir = "$workingDir\Src"
+    $dnvmVersion = "1.0.0-rc1-update1"
 }
 
 framework '4.6x86'
@@ -63,8 +64,35 @@ task Build -depends Clean {
 
 task ILMerge -depends Build {
 
-	exec { .\Tools\ILMerge\ILMerge.exe /wildcards /v4 $releaseDir\Build\$name.exe $releaseDir\Build\*.dll /out:$releaseDir\$name.exe | Out-Default } "ILMerge Error for $name"
+	exec { .\Tools\ILMerge\ILMerge.exe /wildcards /v4 $releaseDir\Build\$name.exe $releaseDir\Build\*.dll /ver:$version /out:$releaseDir\$name.exe | Out-Default } "ILMerge Error for $name"
 	Write-Host "ILMerge to $releaseDir\$name.exe complete!" -ForegroundColor Green
+}
+
+task DnxBuild -depends ILMerge {
+	
+	$p = Get-Location
+	Set-Location -Path $workingSourceDir\netman
+	rename-item -path "$workingSourceDir\netman\project.json.o" -newname "$workingSourceDir\netman\project.json"
+	$projectPath = "$workingSourceDir\netman\project.json"
+	
+	exec { dnvm install $dnvmVersion -r clr | Out-Default }
+	exec { dnvm use $dnvmVersion -r clr | Out-Default }
+	
+	Write-Host -ForegroundColor Green "Restoring packages for $name"
+	Write-Host
+	exec { dnu restore $projectPath --runtime dnx451 | Out-Default }
+	
+	Write-Host -ForegroundColor Green "Building $projectPath"
+	#exec { dnu build --out $workingDir\DNXBuild --configuration Release  | Out-Default }
+    
+    exec { dnu pack --framework dnx451 --out $workingDir\Nuget --configuration Release | Out-Default }
+	
+	#New-Item -Path $workingDir\NuGet\lib -ItemType Directory
+	#robocopy $workingDir\DNXBuild\Release $workingDir\NuGet\lib *.dll *.pdb *.xml /NFL /NDL /NJS /NC /NS /NP /XO /XF /S *.CodeAnalysisLog.xml | Out-Default
+	
+	#Execute-Command -command { del  $workingDir\DNXBuild -Recurse -Force }
+
+	Set-Location -Path $p
 }
 
 function Update-AssemblyInfoFiles ([string] $workingSourceDir, [string] $assemblyVersionNumber, [string] $fileVersionNumber)
